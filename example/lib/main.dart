@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Flutter Slidable Demo'),
+
     );
   }
 }
@@ -79,7 +80,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: _fabColor,
-        onPressed: null,
+        onPressed: (){
+          slidableController.peekState.peek(actionType: SlideActionType.secondary);
+        },
         child: _rotationAnimation == null
             ? Icon(Icons.add)
             : RotationTransition(
@@ -114,8 +117,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return Slidable(
       key: Key(item.title),
       controller: slidableController,
-      peekOnInit: true,
-      peekActionType: SlideActionType.secondary,
       direction: direction,
       dismissal: SlidableDismissal(
         child: SlidableDrawerDismissal(),

@@ -344,15 +344,20 @@ class SlidableController {
   Animation<double> _slideAnimation;
 
   SlidableState _activeState;
+  SlidableState _peekState;
 
   /// The state of the active [Slidable].
   SlidableState get activeState => _activeState;
+
+  SlidableState get peekState => _peekState;
 
   /// Changes the state of the active [Slidable].
   set activeState(SlidableState value) {
     _activeState?._flingAnimationController();
 
     _activeState = value;
+    _peekState = value;
+
     if (onSlideAnimationChanged != null) {
       _slideAnimation?.removeListener(_handleSlideIsOpenChanged);
       if (onSlideIsOpenChanged != null) {
@@ -561,11 +566,12 @@ class Slidable extends StatefulWidget {
 /// The state of [Slidable] widget.
 /// You can open or close the [Slidable] by calling the corresponding methods of
 /// this object.
-class SlidableState extends State<Slidable>
-    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Slidable> {
+class SlidableState extends State<Slidable> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<Slidable> {
   @override
   void initState() {
     super.initState();
+    widget.controller._peekState = this;
+
     _overallMoveController =
         AnimationController(duration: widget.movementDuration, vsync: this)
           ..addStatusListener(_handleDismissStatusChanged)
@@ -716,20 +722,25 @@ class SlidableState extends State<Slidable>
   }
 
   void peek({SlideActionType actionType}) {
-    widget.controller?.activeState = this;
+    Future.delayed(Duration(milliseconds: 1000), () {
+      if (actionType != null && _actionType != actionType) {
+        setState(() {
+          this.actionType = actionType;
+        });
+      }
+      if (_actionCount > 0) {
+        _overallMoveController.animateTo(
+          _totalActionsExtent * 0.5,
+          curve: Curves.easeIn,
+          duration: widget.movementDuration,
+        );
+      }
+    })
+        .whenComplete(() => Future.delayed(Duration(milliseconds: 1000), (){
+      _overallMoveController.fling(velocity: -1.0);
+    }));
 
-    if (actionType != null && _actionType != actionType) {
-      setState(() {
-        this.actionType = actionType;
-      });
-    }
-    if (_actionCount > 0) {
-      _overallMoveController.animateTo(
-        _totalActionsExtent * 0.5,
-        curve: Curves.easeIn,
-        duration: widget.movementDuration,
-      );
-    }
+
   }
 
   /// Closes this [Slidable].
