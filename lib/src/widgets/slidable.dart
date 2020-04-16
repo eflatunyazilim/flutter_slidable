@@ -725,7 +725,7 @@ class SlidableState extends State<Slidable>
     }
     if (_actionCount > 0) {
       _overallMoveController.animateTo(
-        _totalActionsExtent * 0.1,
+        _totalActionsExtent * 0.5,
         curve: Curves.easeIn,
         duration: widget.movementDuration,
       );

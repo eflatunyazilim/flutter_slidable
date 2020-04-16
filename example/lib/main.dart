@@ -114,6 +114,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return Slidable(
       key: Key(item.title),
       controller: slidableController,
+      peekOnInit: true,
+      peekActionType: SlideActionType.secondary,
       direction: direction,
       dismissal: SlidableDismissal(
         child: SlidableDrawerDismissal(),
@@ -178,6 +180,8 @@ class _MyHomePageState extends State<MyHomePage> {
       key: Key(item.title),
       controller: slidableController,
       direction: direction,
+      peekOnInit: true,
+      peekActionType: SlideActionType.secondary,
       dismissal: SlidableDismissal(
         child: SlidableDrawerDismissal(),
         closeOnCanceled: true,
