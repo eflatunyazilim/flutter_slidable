@@ -573,8 +573,8 @@ class SlidableState extends State<Slidable>
     _initAnimations();
 
     if(widget.peekOnInit)
-      Future.delayed(Duration(milliseconds: 500), () => peek(actionType: widget.peekActionType))
-          .whenComplete(() => Future.delayed(Duration(milliseconds: 400), () => close()));
+      Future.delayed(Duration(milliseconds: 1000), () => peek(actionType: widget.peekActionType))
+          .whenComplete(() => Future.delayed(Duration(milliseconds: 1000), () => close()));
   }
 
   void _initAnimations() {
