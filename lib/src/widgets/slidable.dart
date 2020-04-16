@@ -415,6 +415,8 @@ class Slidable extends StatefulWidget {
     SlidableDismissal dismissal,
     SlidableController controller,
     double fastThreshold,
+    bool peekOnInit = false,
+    SlideActionType peekActionType = SlideActionType.primary
   }) : this.builder(
           key: key,
           child: child,
@@ -431,6 +433,8 @@ class Slidable extends StatefulWidget {
           dismissal: dismissal,
           controller: controller,
           fastThreshold: fastThreshold,
+          peekOnInit: peekOnInit,
+          peekActionType: peekActionType
         );
 
   /// Creates a widget that can be slid.
@@ -462,6 +466,8 @@ class Slidable extends StatefulWidget {
     this.enabled = true,
     this.dismissal,
     this.controller,
+    this.peekOnInit = false,
+    this.peekActionType = SlideActionType.primary,
     double fastThreshold,
   })  : assert(actionPane != null),
         assert(direction != null),
@@ -525,6 +531,12 @@ class Slidable extends StatefulWidget {
   /// Defaults to true.
   final bool closeOnScroll;
 
+  ///Specifies to peek actions when initializing Slidable
+  final bool peekOnInit;
+
+  ///Specifies action type to peek actions when initializing Slidable
+  final SlideActionType peekActionType;
+
   /// Whether this slidable is interactive.
   ///
   /// If false, the child will not slid to show slide actions.
@@ -559,6 +571,10 @@ class SlidableState extends State<Slidable>
           ..addStatusListener(_handleDismissStatusChanged)
           ..addListener(_handleOverallPositionChanged);
     _initAnimations();
+
+    if(widget.peekOnInit)
+      Future.delayed(Duration(milliseconds: 500), () => peek(actionType: widget.peekActionType))
+          .whenComplete(() => Future.delayed(Duration(milliseconds: 400), () => close()));
   }
 
   void _initAnimations() {
@@ -693,6 +709,23 @@ class SlidableState extends State<Slidable>
     if (_actionCount > 0) {
       _overallMoveController.animateTo(
         _totalActionsExtent,
+        curve: Curves.easeIn,
+        duration: widget.movementDuration,
+      );
+    }
+  }
+
+  void peek({SlideActionType actionType}) {
+    widget.controller?.activeState = this;
+
+    if (actionType != null && _actionType != actionType) {
+      setState(() {
+        this.actionType = actionType;
+      });
+    }
+    if (_actionCount > 0) {
+      _overallMoveController.animateTo(
+        _totalActionsExtent * 0.1,
         curve: Curves.easeIn,
         duration: widget.movementDuration,
       );
